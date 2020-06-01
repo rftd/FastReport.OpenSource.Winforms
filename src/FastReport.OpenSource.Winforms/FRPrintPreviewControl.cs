@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Printing;
@@ -78,7 +79,7 @@ namespace FastReport.OpenSource.Winforms
         /// </summary>
         public PrintDocument Document
         {
-            get { return doc; }
+            get => doc;
             set
             {
                 // unhook event handlers
@@ -98,6 +99,9 @@ namespace FastReport.OpenSource.Winforms
                     doc.EndPrint += doc_EndPrint;
                 }
 
+                if (txtStartPage != null)
+                    txtStartPage.Text = "1";
+
                 // don't assign document to preview until this form becomes visible
                 preview.Document = Document;
             }
@@ -107,7 +111,7 @@ namespace FastReport.OpenSource.Winforms
         /// Gets a value that indicates whether the <see cref="Document"/> is being rendered.
         /// </summary>
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool IsRendering { get { return preview.IsRendering; } }
+        public bool IsRendering => preview.IsRendering;
 
         /// <summary>
         /// Gets or sets how the zoom should be adjusted when the control is resized.
@@ -115,8 +119,8 @@ namespace FastReport.OpenSource.Winforms
         [DefaultValue(ZoomMode.FullPage)]
         public ZoomMode ZoomMode
         {
-            get { return preview.ZoomMode; }
-            set { preview.ZoomMode = value; }
+            get => preview.ZoomMode;
+            set => preview.ZoomMode = value;
         }
 
         /// <summary>
@@ -127,8 +131,8 @@ namespace FastReport.OpenSource.Winforms
          DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public double Zoom
         {
-            get { return preview.Zoom; }
-            set { preview.Zoom = value; }
+            get => preview.Zoom;
+            set => preview.Zoom = value;
         }
 
         /// <summary>
@@ -142,8 +146,8 @@ namespace FastReport.OpenSource.Winforms
         DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int StartPage
         {
-            get { return preview.StartPage; }
-            set { preview.StartPage = value; }
+            get => preview.StartPage;
+            set => preview.StartPage = value;
         }
 
         /// <summary>
@@ -154,34 +158,22 @@ namespace FastReport.OpenSource.Winforms
         /// </remarks>
         [Browsable(false),
         DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int PageCount
-        {
-            get { return preview.PageCount; }
-        }
+        public int PageCount => preview.PageCount;
 
         /// <summary>
         /// Gets or sets the control's background color.
         /// </summary>
         [DefaultValue(typeof(Color), "AppWorkspace")]
-        public override sealed Color BackColor
+        public sealed override Color BackColor
         {
-            get { return preview.BackColor; }
-            set { preview.BackColor = value; }
-        }
-
-        /// <summary>
-        /// Gets a list containing the images of the pages in the document.
-        /// </summary>
-        [Browsable(false)]
-        public FRPageCollection PageImages
-        {
-            get { return preview.PageImages; }
+            get => preview.BackColor;
+            set => preview.BackColor = value;
         }
 
         public bool ShowToolbar
         {
-            get { return _toolStrip.Visible; }
-            set { _toolStrip.Visible = value; }
+            get => _toolStrip.Visible;
+            set => _toolStrip.Visible = value;
         }
 
         #endregion Propriedades

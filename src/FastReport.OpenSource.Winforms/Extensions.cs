@@ -1,13 +1,37 @@
-using System;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.IO;
+using System.Windows.Forms;
+using FastReport.Export;
 using FastReport.Export.Image;
+using FastReport.Utils;
 
 namespace FastReport.OpenSource.Winforms
 {
     public static class Extensions
     {
+        #region Fields
+
+        private const float scaleFactor = 300 / 96f;
+
+        #endregion Fields
+
+        #region Methods
+
+        public static void PrintWithDialog(this Report report)
+        {
+            using (var dlg = new PrintDialog())
+            {
+                dlg.AllowSomePages = true;
+                dlg.AllowSelection = true;
+                dlg.UseEXDialog = true;
+
+                if (dlg.ShowDialog() != DialogResult.OK) return;
+
+                report.Print(dlg.PrinterSettings);
+            }
+        }
+
         public static void Print(this Report report, PrinterSettings settings = null)
         {
             var doc = report.PrepareDoc(settings);
@@ -51,15 +75,18 @@ namespace FastReport.OpenSource.Winforms
             if (settings != null)
                 doc.PrinterSettings = settings;
 
+            // Ajustando o tamanho da pagina
             doc.QueryPageSettings += (sender, args) =>
             {
                 var rPage = report.PreparedPages.GetPage(page);
-
                 args.PageSettings.Landscape = rPage.Landscape;
+                args.PageSettings.Margins = new Margins((int)(scaleFactor * rPage.LeftMargin * Units.HundrethsOfInch),
+                                                        (int)(scaleFactor * rPage.RightMargin * Units.HundrethsOfInch),
+                                                        (int)(scaleFactor * rPage.TopMargin * Units.HundrethsOfInch),
+                                                        (int)(scaleFactor * rPage.BottomMargin * Units.HundrethsOfInch));
 
-                var width = (int)Math.Round(rPage.PaperWidth /= 0.254f);
-                var height = (int)Math.Round(rPage.PaperHeight /= 0.254f);
-                args.PageSettings.PaperSize = new PaperSize("Custom", width, height);
+                args.PageSettings.PaperSize = new PaperSize("Custom", (int)(ExportUtils.GetPageWidth(rPage) * scaleFactor * Units.HundrethsOfInch),
+                                                                      (int)(ExportUtils.GetPageHeight(rPage) * scaleFactor * Units.HundrethsOfInch));
             };
 
             doc.BeginPrint += (sender, args) => ms?.Dispose();
@@ -81,11 +108,13 @@ namespace FastReport.OpenSource.Winforms
 
             doc.Disposed += (sender, args) =>
             {
-                ms.Dispose();
-                exp.Dispose();
+                ms?.Dispose();
+                exp?.Dispose();
             };
 
             return doc;
         }
+
+        #endregion Methods
     }
 }

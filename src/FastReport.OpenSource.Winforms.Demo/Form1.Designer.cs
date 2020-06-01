@@ -31,7 +31,7 @@ namespace WinFormsOpenSource
         private void InitializeComponent()
         {
             this.ReportsList = new System.Windows.Forms.ListBox();
-            this.frPrintPreviewControl1 = new FRPrintPreviewControl();
+            this.frPrintPreviewControl1 = new FastReport.OpenSource.Winforms.FRPrintPreviewControl();
             this.SuspendLayout();
             // 
             // ReportsList

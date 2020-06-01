@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -22,6 +23,7 @@ namespace FastReport.OpenSource.Winforms
         private bool cancel;
         private const int MARGIN = 4;
         private bool Inicializando;
+        private readonly List<Image> pageImages;
 
         #endregion Fields
 
@@ -30,6 +32,7 @@ namespace FastReport.OpenSource.Winforms
         public FRPreview()
         {
             Inicializando = true;
+            pageImages = new List<Image>();
             BackColor = SystemColors.AppWorkspace;
             zoomMode = ZoomMode.FullPage;
             startPage = 0;
@@ -143,7 +146,7 @@ namespace FastReport.OpenSource.Winforms
         /// </remarks>
         [Browsable(false),
         DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int PageCount => PageImages.Count;
+        public int PageCount => pageImages.Count;
 
         /// <summary>
         /// Gets or sets the control's background color.
@@ -158,12 +161,6 @@ namespace FastReport.OpenSource.Winforms
                 backBrush = new SolidBrush(value);
             }
         }
-
-        /// <summary>
-        /// Gets a list containing the images of the pages in the document.
-        /// </summary>
-        [Browsable(false)]
-        public FRPageCollection PageImages { get; } = new FRPageCollection();
 
         #endregion Propriedades
 
@@ -246,7 +243,7 @@ namespace FastReport.OpenSource.Winforms
             if (doc != null)
             {
                 // prepare to render preview document
-                PageImages.Clear();
+                pageImages.Clear();
                 var savePc = doc.PrintController;
 
                 // render preview document
@@ -577,10 +574,10 @@ namespace FastReport.OpenSource.Winforms
 
             var pageInfo = pv.GetPreviewPageInfo();
             var count = lastPageReady ? pageInfo.Length : pageInfo.Length - 1;
-            for (var i = PageImages.Count; i < count; i++)
+            for (var i = pageImages.Count; i < count; i++)
             {
                 var img = pageInfo[i].Image;
-                PageImages.Add(img);
+                pageImages.Add(img);
 
                 OnPageCountChanged();
 
@@ -595,7 +592,7 @@ namespace FastReport.OpenSource.Winforms
 
         private Image GetImage(int page)
         {
-            return page > -1 && page < PageCount ? PageImages[page] : null;
+            return page > -1 && page < PageCount ? pageImages[page] : null;
         }
 
         private Rectangle GetImageRectangle(Image img)
@@ -745,14 +742,14 @@ namespace FastReport.OpenSource.Winforms
             private readonly int first;
             private readonly int last;
             private int index;
-            private readonly FRPageCollection imgList;
+            private readonly List<Image> imgList;
 
             public DocumentPrinter(FRPreview preview, int first, int last)
             {
                 // save page range and image list
                 this.first = first;
                 this.last = last;
-                imgList = preview.PageImages;
+                imgList = preview.pageImages;
 
                 // copy page and printer settings from original document
                 DefaultPageSettings = preview.Document.DefaultPageSettings;
