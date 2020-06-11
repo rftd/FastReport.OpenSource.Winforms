@@ -67,7 +67,6 @@ namespace FastReport.OpenSource.Winforms
                 if (report.PreparedPages.Count < 1) return null;
             }
 
-            MemoryStream ms = null;
             var page = 0;
             var exp = new ImageExport { ImageFormat = ImageExportFormat.Png, Resolution = 600 };
 
@@ -89,28 +88,24 @@ namespace FastReport.OpenSource.Winforms
                                                                       (int)(ExportUtils.GetPageHeight(rPage) * scaleFactor * Units.HundrethsOfInch));
             };
 
-            doc.BeginPrint += (sender, args) => ms?.Dispose();
-
             doc.PrintPage += (sender, args) =>
             {
-                ms = new MemoryStream();
-                exp.PageRange = PageRange.PageNumbers;
-                exp.PageNumbers = $"{page + 1}";
-                exp.Export(report, ms);
+                using (var ms = new MemoryStream())
+                {
+                    exp.PageRange = PageRange.PageNumbers;
+                    exp.PageNumbers = $"{page + 1}";
+                    exp.Export(report, ms);
 
-                args.Graphics.DrawImage(Image.FromStream(ms), args.PageBounds);
+                    args.Graphics.DrawImage(Image.FromStream(ms), args.PageBounds);
+                }
+
                 page++;
 
                 args.HasMorePages = page < report.PreparedPages.Count;
             };
 
             doc.EndPrint += (sender, args) => page = 0;
-
-            doc.Disposed += (sender, args) =>
-            {
-                ms?.Dispose();
-                exp?.Dispose();
-            };
+            doc.Disposed += (sender, args) => exp?.Dispose();
 
             return doc;
         }
