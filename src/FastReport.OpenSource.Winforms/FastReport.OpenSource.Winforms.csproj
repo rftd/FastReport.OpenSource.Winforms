@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FastReport.OpenSource" Version="2020.3.4" />
+    <PackageReference Include="FastReport.OpenSource" Version="2020.4.0" />
   </ItemGroup>
 
 </Project>
